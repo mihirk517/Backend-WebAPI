@@ -1,10 +1,10 @@
 using WebAPI.Data;
-using WebAPI.Services.SuperHeroService;
-using WebAPI.Services.UserAuthService;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Net.Http.Headers;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.DataAccess.IRepository;
+using WebAPI.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +21,13 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
                 builder.Configuration.GetSection("AppSettings:SecretKey").Value!))
     };
 });
+builder.Services.AddCors(options => options.AddDefaultPolicy(
+    policy => policy.AllowAnyOrigin().AllowAnyHeader()));
+builder.Services.AddDbContext<DatabaseContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    providerOptions => providerOptions.EnableRetryOnFailure());
+});
 
 // Add services to the container.
 
@@ -33,13 +40,16 @@ builder.Services.AddSwaggerGen(options =>
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Name = "Authorization",
+        BearerFormat= "JWT",
+        Scheme ="bearer",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-builder.Services.AddScoped<ISuperHeroService, SuperHeroService>();
-builder.Services.AddScoped<IUserAuthService, UserAuthService>();
-builder.Services.AddDbContext<DatabaseContext>();
+
+builder.Services.AddScoped<IUserRepository, UsersRepository>();
+builder.Services.AddScoped<IPostsRepository, PostsRepository>();
+builder.Services.AddScoped<IVotesRepository, VotesRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,6 +60,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

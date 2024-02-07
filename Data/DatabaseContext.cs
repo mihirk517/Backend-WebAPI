@@ -12,14 +12,24 @@ namespace WebAPI.Data
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) 
         {
             
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS01;Database=SuperHerodb;Trusted_Connection=True;TrustServerCertificate=true;");
-        }
-        public DbSet<SuperHero> SuperHeroes { get; set; }
-
+        }        
         public DbSet<User> Users { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Vote> Votes { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .Property(x => x.Timestamp)
+                .HasDefaultValueSql("GetDate()");
+
+            modelBuilder.Entity<Post>()
+                .Property<DateTime>(x => x.createdAt)
+                .HasDefaultValueSql("GetDate()");
+
+            modelBuilder.Entity<Vote>()
+                .HasNoKey();
+        }
     }
 }
