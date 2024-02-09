@@ -12,7 +12,6 @@ using WebAPI.Data;
 using WebAPI.DataAccess.IRepository;
 using WebAPI.Models;
 using WebAPI.Models.DTO;
-using WebAPI.Services.UserAuthService;
 
 
 namespace WebAPI.Controllers
@@ -22,16 +21,15 @@ namespace WebAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IUserRepository _userRepository;
-        private readonly IHttpContextAccessor _httpContext;
+        private readonly IUserRepository _userRepository;        
         private readonly DatabaseContext _db;
 
-        public AuthController(IConfiguration configuration, DatabaseContext db,IUserRepository userRepository,IHttpContextAccessor httpContextAccessor)
+        public AuthController(IConfiguration configuration, DatabaseContext db,IUserRepository userRepository)
         {
             _configuration = configuration;            
             _db = db;
             _userRepository = userRepository;
-            _httpContext = httpContextAccessor;
+            ;
         }
 
 

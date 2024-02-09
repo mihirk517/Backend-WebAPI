@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using WebAPI.DataAccess.IRepository;
 using WebAPI.Models;
 using WebAPI.Models.DTO;
@@ -7,7 +8,7 @@ using WebAPI.Models.DTO;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Authorize]
+    
     public class PostsController : ControllerBase
     {
         private readonly IPostsRepository _postsRepository;
@@ -20,6 +21,10 @@ namespace WebAPI.Controllers
             _usersRepository = userRepository;
         }
         [HttpPost("posts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize]
         public IActionResult CreatePost(PostCreate request)
         {
             if (!ModelState.IsValid)
@@ -44,6 +49,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize]
         public IActionResult GetPost(int? id)
         {
             Post post = _postsRepository.Get(x =>x.Id == id,includeprops:nameof(User));
@@ -57,6 +65,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("posts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        
         public IActionResult GetAllPosts()
         {
             List<Post> posts = _postsRepository.GetAll(includeprops:nameof(User)).ToList();            
@@ -68,8 +78,12 @@ namespace WebAPI.Controllers
 
             return Ok(postsDto);
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult DeletePost(int? id)
         {
             Post post = _postsRepository.Get(x => x.Id == id,includeprops:nameof(User));
@@ -86,10 +100,18 @@ namespace WebAPI.Controllers
             return Ok("Delete Sucessfull");
 
         }
-
+        [Authorize]
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult UpdatePost(int? id, PostCreate request)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             Post post = _postsRepository.Get(x => x.Id == id, includeprops: nameof(User));
             if (post == null)
             {
