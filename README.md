@@ -12,7 +12,7 @@ The working of the front-end with Vue.js is described shown below. Where posts a
 
 https://github.com/mihirk517/Backend-WebAPI/assets/50024720/a19a5ebd-5da3-46f3-b43c-b32be0cc4ba4
 
-The repossitory for from end is located here : https://github.com/mihirk517/front-end
+The repository for from end is located here : https://github.com/mihirk517/front-end
 
 
 This is a C# WebAPI equivalent for for the Python FastAPI project whose video can be seen here :https://github.com/mihirk517/FastApi 
